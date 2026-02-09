@@ -47,7 +47,7 @@ end)
 game:GetService("RunService").Heartbeat:Connect(function(dt)
     if WaveManager.IsWaveActive then
         UnitService.Update(dt, WaveManager.CurrentPath, WaveManager.Host)
-        TowerService.Update(dt, UnitService.ActiveUnits)
+        TowerService.Update(dt, UnitService.ActiveUnits, WaveManager.CurrentWave)
         PickupService.Update(UnitService.ActiveUnits)
 
         if #UnitService.ActiveUnits == 0 then
@@ -94,14 +94,29 @@ ReplicatedStorage:WaitForChild("BuyEgg").OnServerEvent:Connect(function(player)
     end
 end)
 
-ReplicatedStorage:WaitForChild("MergeUnits").OnServerEvent:Connect(function(player, unitId1, unitId2)
-    local u1 = UnitService.GetUnitById(unitId1)
-    local u2 = UnitService.GetUnitById(unitId2)
+ReplicatedStorage:WaitForChild("MergeUnits").OnServerEvent:Connect(function(player)
+    -- Simplified Merge All: finds pairs of same type and level
+    local mergedSomething = true
+    while mergedSomething do
+        mergedSomething = false
+        local units = {}
+        for _, u in ipairs(UnitService.ActiveUnits) do
+            if u.owner == player then
+                table.insert(units, u)
+            end
+        end
 
-    if u1 and u2 and u1.owner == player and u2.owner == player then
-        local newUnit = UnitService.MergeUnits(player, u1, u2)
-        if newUnit then
-            print(player.Name .. " merged two units into a level " .. newUnit.level .. " unit")
+        for i = 1, #units do
+            for j = i + 1, #units do
+                local u1 = units[i]
+                local u2 = units[j]
+                if u1.unitType == u2.unitType and u1.level == u2.level then
+                    UnitService.MergeUnits(player, u1, u2)
+                    mergedSomething = true
+                    break
+                end
+            end
+            if mergedSomething then break end
         end
     end
 end)

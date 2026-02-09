@@ -9,11 +9,13 @@ function EconomyService.InitializePlayer(player)
         gold = 200, -- Starting gold
         units = {}
     }
+    player:SetAttribute("Gold", 200)
 end
 
 function EconomyService.AddGold(player, amount)
     if EconomyService.PlayerData[player] then
         EconomyService.PlayerData[player].gold = EconomyService.PlayerData[player].gold + amount
+        player:SetAttribute("Gold", EconomyService.PlayerData[player].gold)
     end
 end
 
@@ -37,6 +39,8 @@ function EconomyService.BuyEgg(player)
 
     if data.gold >= GameConstants.EGG_PRICE then
         data.gold = data.gold - GameConstants.EGG_PRICE
+        player:SetAttribute("Gold", data.gold)
+
         -- Drop a random unit
         local unitTypes = {"BASIC", "FAST", "TANK"}
         local randomType = unitTypes[math.random(1, #unitTypes)]

@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+-- We need CurrentWave from WaveManager, but it might cause circular dependency if we require it.
+-- Better to pass the wave number or store it in a shared attribute on Workspace.
 
 local TowerService = {}
 TowerService.Towers = {}
@@ -26,13 +28,16 @@ function TowerService.SpawnTower(towerType, position)
     table.insert(TowerService.Towers, tower)
 end
 
-function TowerService.Update(dt, units)
+function TowerService.Update(dt, units, waveNumber)
     local currentTime = os.clock()
+    local damageMultiplier = 1 + (waveNumber - 1) * 0.2 -- 20% increase per wave
+
     for _, tower in ipairs(TowerService.Towers) do
         if currentTime - tower.lastFired >= tower.stats.fireRate then
             local target = TowerService.FindTarget(tower, units)
             if target then
-                TowerService.Attack(tower, target)
+                local damage = tower.stats.damage * damageMultiplier
+                TowerService.Attack(tower, target, damage)
                 tower.lastFired = currentTime
             end
         end
@@ -54,10 +59,10 @@ function TowerService.FindTarget(tower, units)
     return closestUnit
 end
 
-function TowerService.Attack(tower, unit)
+function TowerService.Attack(tower, unit, damage)
     -- Deal damage to unit
     if unit.TakeDamage then
-        unit:TakeDamage(tower.stats.damage)
+        unit:TakeDamage(damage)
 
         -- Visual effect (simplified)
         local beam = Instance.new("Part")
