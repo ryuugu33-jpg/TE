@@ -4,32 +4,26 @@
     "$className": "DataModel",
 
     "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
       "Shared": {
         "$path": "src/shared"
       }
     },
 
     "ServerScriptService": {
+      "$className": "ServerScriptService",
       "Server": {
         "$path": "src/server"
       }
     },
 
     "StarterPlayer": {
+      "$className": "StarterPlayer",
       "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
         "Client": {
           "$path": "src/client"
         }
-      }
-    },
-
-    "Workspace": {
-      "$className": "Workspace",
-      "Baseplate": {
-        "$className": "Part",
-        "Size": [200, 2, 200],
-        "Position": [0, -1, 0],
-        "Anchored": true
       }
     }
   }
